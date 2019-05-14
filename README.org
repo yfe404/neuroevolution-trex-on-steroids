@@ -1,6 +1,6 @@
 * Neuroevolution 
 
-I love Jurassik Park, I love AI, I love Genetic Algorithms. Let mix them all 🦖 
+I love Jurassic Park, I love AI, I love Genetic Algorithms. Let's mix them all 🦖 
 
 
 ** Dependencies
