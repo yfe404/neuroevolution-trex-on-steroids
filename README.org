@@ -1,0 +1,9 @@
+* Neuroevolution 
+
+I love Jurassik Park, I love AI, I love Genetic Algorithms. Let mix them all 🦖 
+
+
+** Dependencies
+
+ - [[https://www.youtube.com/watch?v=PPl__iyIg6w][Jurassic Park Music & Ambience - Amazing Soundscapes and Music]]
+ - Coffee
