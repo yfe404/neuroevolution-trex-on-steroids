@@ -8,6 +8,12 @@ I love Jurassic Park, I love AI, I love Genetic Algorithms. Let's mix them all ð
  - [[https://www.youtube.com/watch?v=PPl__iyIg6w][Jurassic Park Music & Ambience - Amazing Soundscapes and Music]]
  - Coffee
 
+** Usage 
+
+1. In your browser open =game/index.html=
+2. In your terminal run =python main.py=
+3. Go back to your browser and refresh
+4. The game should start automatically
 
 ** Roadmap
 
