@@ -874,7 +874,25 @@
                 this.inverted = document.body.classList.toggle(Runner.classes.INVERTED,
                     this.invertTrigger);
             }
-        }
+        },
+
+	postState: function (ws) {
+            console.log("in postState function");
+            var canvas = document.getElementsByClassName('runner-canvas')[0];
+            var dataUrl = canvas.toDataURL("image/png");
+
+            console.log(dataUrl);
+            console.log(this.crashed);
+
+            var state = {
+                world: dataUrl,
+                crashed: this.crashed.toString(),
+		distance: this.distanceRan
+            }
+
+            ws.send(JSON.stringify(state))
+
+	}
     };
 
 
@@ -2709,7 +2727,62 @@
 
 
 function onDocumentLoad() {
-    new Runner('.interstitial-wrapper');
+    runner = new Runner('.interstitial-wrapper');
 }
 
 document.addEventListener('DOMContentLoaded', onDocumentLoad);
+var socket = new WebSocket("ws://127.0.0.1:8765");
+
+socket.onopen = function()
+{
+    console.log("Browser is ready to start receiving commands...");
+};
+
+function simulateKey(type, keyCode) {
+     var eventObj = document.createEventObject ?
+         document.createEventObject() : document.createEvent("Events");
+
+     if(eventObj.initEvent){
+         eventObj.initEvent(type, true, true);
+     }
+
+    eventObj.keyCode = keyCode;
+    eventObj.which = keyCode;
+
+    document.dispatchEvent(eventObj)
+}
+
+socket.onmessage = function (evt)
+{
+    var command = evt.data;
+    var runner = new Runner();
+    console.log(command);
+
+    switch (command) {
+        case 'STATE':
+            runner.postState(socket);
+            break;
+        case 'START':
+            simulateKey("keydown", 32); // space
+            setTimeout(function() {simulateKey("keyup", 32);} , 1000);
+            break;
+        case 'REFRESH':
+            location.reload(true);
+            break;
+        case 'UP':
+            simulateKey("keydown", 38); // arrow up
+            setTimeout(function() {simulateKey("keyup", 38);} , 400);
+            break;
+        case 'DOWN':
+            simulateKey("keydown", 40); // arrow down
+            setTimeout(function() {simulateKey("keyup", 40);} , 400);
+            break;
+        default:
+    }
+};
+
+socket.onclose = function()
+{
+    // websocket is closed.
+    console.log("connection closed");
+};

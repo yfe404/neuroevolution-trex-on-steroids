@@ -11,8 +11,10 @@ I love Jurassic Park, I love AI, I love Genetic Algorithms. Let's mix them all ð
 
 ** Roadmap
 
-0. Extract the game state from the browser 
-1. Implement a duplex channel to allow for communication between our program and the game.
-2. to be defined
+[x] Extract the game state from the browser 
+[x] Implement a duplex channel to allow for communication between our program and the game.
+[x] Implement a dummy agent that performs actions randomly to check that our architecture works correctly
+[x] Implement a CNNAgent randomly initialized that takes as input a ROI (Region Of Interest) and output an action 
+4. to be defined
 
 
