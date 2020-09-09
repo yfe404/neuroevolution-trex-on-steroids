@@ -1,4 +1,4 @@
-from scipy.misc import imresize
+from skimage.transform import resize
 import numpy as np
 
 class Preprocessor:
@@ -17,7 +17,7 @@ class Preprocessor:
         unharmful_obstacles_idx = roi > 200
         processed[unharmful_obstacles_idx] = 0
 
-        processed = imresize(processed, (self.height, self.width, 1))
+        processed = resize(processed, (self.height, self.width, 1))
         processed = processed / 255.0
         return processed
 
