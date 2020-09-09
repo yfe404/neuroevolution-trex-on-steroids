@@ -10,7 +10,9 @@ I love Jurassic Park, I love AI, I love Genetic Algorithms. Let's mix them all ð
 
 ** Usage 
 
-1. In your browser open =game/index.html=
+0. Cd into ./game and run a local dev server to serve the game files =python3 -m http.server
+1. In your browser open http://localhost:8000 or whatever port the
+   server ran in step 0. is running
 2. In your terminal run =python main.py=
 3. Go back to your browser and refresh
 4. The game should start automatically
