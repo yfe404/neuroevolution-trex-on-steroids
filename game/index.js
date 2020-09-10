@@ -881,13 +881,27 @@
             var canvas = document.getElementsByClassName('runner-canvas')[0];
             var dataUrl = canvas.toDataURL("image/png");
 
+	    console.log(this.distanceRan)
             console.log(dataUrl);
             console.log(this.crashed);
+	    var perceived =  {speed: this.currentSpeed, obstacles: this.obstacles}
+	    console.log(perceived)
 
+	    console.log(this.tRex)
+	    console.log(this.tRex.xPos);
+	    console.log(this.tRex.yPos);
+	    console.log(this.horizon.obstacles);
+	    
             var state = {
                 world: dataUrl,
                 crashed: this.crashed.toString(),
-		distance: this.distanceRan
+		distance: this.distanceRan,
+		perceived: {
+		    speed: this.currentSpeed,
+		    xPos: this.tRex.xPos,
+		    yPos: this.tRex.yPos,
+		    obstacles: this.horizon.obstacles
+		}
             }
 
             ws.send(JSON.stringify(state))

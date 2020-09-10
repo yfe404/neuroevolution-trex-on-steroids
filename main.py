@@ -1,7 +1,8 @@
 import numpy as np
-from preprocessor import Preprocessor
+from preprocessor import Preprocessor, SimplePreprocessor
 from environment import Environment
 from monkey import MonkeyAgent
+from neuralnet import NeuralNetAgent
 
 
 ## Constants
@@ -14,10 +15,27 @@ def softmax(x):
     return np.array(x)/sum(x)
 
 def crossover(parentA, parentB):
-    raise NotImplementedError
+    ctx0 = np.random.randint(0, parentA.weights_0_1.size)
+    ctx1 = np.random.randint(0, parentA.weights_1_2.size)
+
+    offspring = NeuralNetAgent(parentA.num_actions, parentA.input_size, parentA.hidden_size)
+
+    offspring.weights_0_1 = np.concatenate((np.ravel(parentA.weights_0_1)[:ctx0], np.ravel(parentB.weights_0_1)[ctx0:])).reshape(parentB.weights_0_1.shape)
+
+    offspring.weights_1_2 = np.concatenate((np.ravel(parentA.weights_1_2)[:ctx1], np.ravel(parentB.weights_1_2)[ctx1:])).reshape(parentB.weights_1_2.shape)
+
+    return offspring
                     
 def mutate(agent, pmut=.01):
-    raise NotImplementedError
+    mask0 = np.random.random(agent.weights_0_1.shape)
+    mask0 = mask0 * (mask0 < pmut)
+    agent.weights_0_1 = (agent.weights_0_1 * mask0!=0) * mask0 + (agent.weights_0_1 * mask0==0) * agent.weights_0_1
+
+    mask1 = np.random.random(agent.weights_1_2.shape)
+    mask1 = mask1 * (mask1 < pmut)
+    agent.weights_1_2 = (agent.weights_1_2 * mask1!=0) * mask1 + (agent.weights_1_2 * mask1==0) * agent.weights_1_2
+
+    return agent
 
 def play_generation(population, env, preprocessor):
     gen_count = 0
@@ -47,11 +65,8 @@ def play_generation(population, env, preprocessor):
         #print(softmax(fitness))
         parentA = np.random.choice(population, p=softmax(fitness))
         parentB = np.random.choice(population, p=softmax(fitness))
-        offspring = crossover(parentA, parentB)
+        offspring = mutate(crossover(parentA, parentB))
         population[np.argmin(fitness)] = offspring
-
-        for agent in population:
-            mutate(agent)
 
 
 
@@ -74,12 +89,11 @@ def play(agent, env, preprocessor):
 
 def main():
     # Initialize key objects: environment, agent and preprocessor
-    env = Environment("127.0.0.1", 8765)
-    agent = MonkeyAgent(num_actions, width, height, None, None)
+    env = Environment("127.0.0.1", 8765, debug=False)
 
-    preprocessor = Preprocessor(width, height)
+    preprocessor = SimplePreprocessor()
     #play(agent, env, preprocessor)
-    play_generation([MonkeyAgent(num_actions, width, height, None, None) for _ in range(10)], env, preprocessor)
+    play_generation([NeuralNetAgent(num_actions, input_size=6, hidden_size=4) for _ in range(3)], env, preprocessor)
 
 if __name__ == "__main__":
     main()

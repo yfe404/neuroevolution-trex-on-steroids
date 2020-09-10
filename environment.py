@@ -39,7 +39,7 @@ class Environment:
     def new_message(self, client, server, message):
         if self.debug: print("GameAgent: Incoming data from game")
         data = json.loads(message)
-        image, crashed, distance = data['world'], data['crashed'], data['distance']
+        image, crashed, distance, perceived = data['world'], data['crashed'], data['distance'], data['perceived']
 
         # remove data-info at the beginning of the image
         image = re.sub('data:image/png;base64,', '',image)
@@ -49,7 +49,7 @@ class Environment:
         # cast to bool
         crashed = True if crashed in ['True', 'true'] else False
 
-        self.queue.put((image, crashed, distance))
+        self.queue.put((image, crashed, distance, perceived))
 
     def start_game(self):
         """
@@ -90,7 +90,7 @@ class Environment:
     def get_state(self, action):
         self.server.send_message(self.game_client, "STATE");
 
-        image, crashed, distance = self.queue.get()
+        image, crashed, distance, perceived = self.queue.get()
 
         if crashed:
             reward = float(distance)
@@ -104,4 +104,5 @@ class Environment:
 #            else:
 #                reward = 1.
 
-        return image, reward, crashed
+        #return image, reward, crashed
+        return perceived, reward, crashed
