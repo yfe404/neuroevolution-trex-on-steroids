@@ -3,7 +3,7 @@ from preprocessor import Preprocessor, SimplePreprocessor
 from environment import Environment
 from monkey import MonkeyAgent
 from neuralnet import NeuralNetAgent
-
+from copy import copy
 
 ## Constants
 width = 80
@@ -12,7 +12,7 @@ len_epoch = int(1E8)
 num_actions = len(Environment.actions)
 
 def softmax(x):
-    return np.array(x)/sum(x)
+    return x/x.sum()
 
 def crossover(parentA, parentB):
     ctx0 = np.random.randint(0, parentA.weights_0_1.size)
@@ -27,13 +27,13 @@ def crossover(parentA, parentB):
     return offspring
                     
 def mutate(agent, pmut=.01):
-    mask0 = np.random.random(agent.weights_0_1.shape)
-    mask0 = mask0 * (mask0 < pmut)
-    agent.weights_0_1 = (agent.weights_0_1 * mask0!=0) * mask0 + (agent.weights_0_1 * mask0==0) * agent.weights_0_1
-
-    mask1 = np.random.random(agent.weights_1_2.shape)
-    mask1 = mask1 * (mask1 < pmut)
-    agent.weights_1_2 = (agent.weights_1_2 * mask1!=0) * mask1 + (agent.weights_1_2 * mask1==0) * agent.weights_1_2
+    bit = None
+    if np.random.random() < .5:
+        bit = np.random.randint(0, agent.weights_0_1.shape[0]), np.random.randint(0, agent.weights_0_1.shape[1])
+        agent.weights_0_1[bit] = np.random.random()
+    else:
+        bit = np.random.randint(0, agent.weights_1_2.shape[0]), np.random.randint(0, agent.weights_1_2.shape[1])
+        agent.weights_1_2[bit] = np.random.random()
 
     return agent
 
@@ -42,7 +42,7 @@ def play_generation(population, env, preprocessor):
     print()
     print("#Gen\tmin\tmax\tmean")
     while True:
-        fitness = [0 for _ in range(len(population))]
+        fitness = np.array([0 for _ in range(len(population))])
         for idx,agent in enumerate(population):
             frame, _, crashed = env.start_game()
             frame = preprocessor.process(frame)
@@ -62,11 +62,17 @@ def play_generation(population, env, preprocessor):
         print(f"{gen_count}\t{min(fitness)}\t{max(fitness)}\t{np.mean(fitness)}")
         
         gen_count += 1
-        #print(softmax(fitness))
-        parentA = np.random.choice(population, p=softmax(fitness))
-        parentB = np.random.choice(population, p=softmax(fitness))
-        offspring = mutate(crossover(parentA, parentB))
-        population[np.argmin(fitness)] = offspring
+
+        new_generation = []
+        new_generation.append(copy(population[np.argmax(fitness)]))
+
+        while len(new_generation) != len(population):
+        
+            parentA = np.random.choice(population, p=softmax(fitness/fitness.max()))
+            parentB = np.random.choice(population, p=softmax(fitness/fitness.max()))
+            offspring = mutate(crossover(parentA, parentB))
+            new_generation.append(offspring)
+        population = new_generation
 
 
 
@@ -93,7 +99,7 @@ def main():
 
     preprocessor = SimplePreprocessor()
     #play(agent, env, preprocessor)
-    play_generation([NeuralNetAgent(num_actions, input_size=6, hidden_size=4) for _ in range(3)], env, preprocessor)
+    play_generation([NeuralNetAgent(num_actions, input_size=4, hidden_size=5) for _ in range(5)], env, preprocessor)
 
 if __name__ == "__main__":
     main()

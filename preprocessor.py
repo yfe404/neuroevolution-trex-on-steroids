@@ -41,17 +41,23 @@ class SimplePreprocessor:
 
     def get_updated_state(self, next_frame):
 #        print(next_frame)
-        speed = next_frame.get("speed") 
-        x_pos = next_frame.get("xPos") 
-        y_pos = next_frame.get("yPos") 
+        speed = next_frame.get("speed") / 10
+        x_pos = next_frame.get("xPos") / 200
+        y_pos = next_frame.get("yPos") / 200
         has_obstacles = len(next_frame.get("obstacles")) > 0
 
         next_obstacle_x_pos = -1
         next_obstacle_y_pos = -1
         type_obstacle = -1
+        size = 0
+        distance = 0
+        
         if has_obstacles:
-            next_obstacle_x_pos = next_frame.get("obstacles")[0].get('xPos')
-            next_obstacle_y_pos = next_frame.get("obstacles")[0].get('yPos')
+            next_obstacle_x_pos = next_frame.get("obstacles")[0].get('xPos') / 200
+            next_obstacle_y_pos = next_frame.get("obstacles")[0].get('yPos') / 200
+            distance = next_obstacle_x_pos - x_pos
+            
+            size = next_frame.get("obstacles")[0].get('xPos') / 4
             
             if next_frame.get("obstacles")[0].get('typeConfig').get('type') == 'CACTUS_SMALL':
                 type_obstacle = 0.33
@@ -63,7 +69,7 @@ class SimplePreprocessor:
             assert type_obstacle > -1
 
             
-        self.state = np.array([speed, x_pos, y_pos, next_obstacle_x_pos, next_obstacle_y_pos, type_obstacle])
+        self.state = np.array([speed, distance, next_obstacle_y_pos, type_obstacle])
 
 #        print(self.state)
         return self.state
