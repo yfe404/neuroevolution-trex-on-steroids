@@ -130,6 +130,8 @@ class WebsocketServer(ThreadingMixIn, TCPServer, API):
 			if client['handler'] == handler:
 				return client
 
+	def close(self):
+		self.server_close()
 
 
 class WebSocketHandler(StreamRequestHandler):

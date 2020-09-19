@@ -51,6 +51,9 @@ class Environment:
 
         self.queue.put((image, crashed, distance, perceived))
 
+    def close(self):
+        self.server.close()
+        
     def start_game(self):
         """
         Starts the game and lets the TRex run for half a second and then returns the initial state.
