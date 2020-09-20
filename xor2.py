@@ -18,6 +18,7 @@ from preprocessor import Preprocessor, SimplePreprocessor
 from environment import Environment
 
 import webbrowser
+from multiprocessing import Lock
 
 def run_http(port, server_class=HTTPServer, handler_class=BaseHTTPRequestHandler):
     server_address = ('', port)
@@ -35,17 +36,65 @@ class Process(multiprocessing.Process):
         print("I'm the process with id: {}".format(self.id)) 
 
 
+p8888 = Lock() # 8765
+p8889 = Lock() # 8766
+p8890 = Lock() # 8767
+p8891 = Lock() # 8768
+p8892 = Lock() # 8769
+#
+p8893 = Lock() # 8770
+p8894 = Lock() # 8771
+p8895 = Lock() # 8772
+p8896 = Lock() # 8773
+p8897 = Lock() # 8774
+
+def get_port():
+    if p8888.acquire(block=False):
+        return 0
+
+    if p8889.acquire(block=False):
+        return 1
+
+    if p8890.acquire(block=False):
+        return 2
+
+    if p8891.acquire(block=False):
+        return 3
+
+    if p8892.acquire(block=False):
+        return 4
+
+    if p8893.acquire(block=False):
+        return 5
+
+    if p8894.acquire(block=False):
+        return 6
+
+    if p8895.acquire(block=False):
+        return 7
+
+    if p8896.acquire(block=False):
+        return 8
+
+    if p8897.acquire(block=False):
+        return 9
+
+
 def eval_genome(genome, config):
     net = neat.nn.FeedForwardNetwork.create(genome[1], config)
     fitness = 0.0
 
-    env = Environment("127.0.0.1", 8765, debug=False)
+    _id = get_port()
+    print(_id)
 
-    w = webbrowser.get(using="opera")
-    w.open_new("http://localhost:8888")
+    env = Environment("127.0.0.1", 8765+_id, debug=False)
+    time.sleep(2)
+
+    subprocess.Popen(["qutebrowser", "--target", "window", f"http://localhost:{8888+_id}"])
 
     preprocessor = SimplePreprocessor()
-    
+
+    time.sleep(10)
     frame, _, crashed = env.start_game()
     frame = preprocessor.process(frame)
     state = preprocessor.get_initial_state(frame)
@@ -66,14 +115,26 @@ def eval_genome(genome, config):
     return fitness
     
 def eval_genomes(genomes, config):
-    pool = multiprocessing.Pool(processes=1)
+    pool = multiprocessing.Pool(processes=10)
     eval_genome_fixed_conf=partial(eval_genome, config=config)
     fitnesses = pool.map(eval_genome_fixed_conf, genomes)
     for genome, fitness in zip([g[1] for g in genomes], fitnesses):
         genome.fitness = fitness
 
-    subprocess.Popen(["pkill", "opera"])
+    subprocess.Popen(["pkill", "qutebrowser"])
+    p8888.release()
+    p8889.release()
+    p8890.release()
+    p8891.release()
+    p8892.release()
 
+    p8893.release()
+    p8894.release()
+    p8895.release()
+    p8896.release()
+    p8897.release()
+
+    
 def run(config_file):
     # Load configuration.
     config = neat.Config(neat.DefaultGenome, neat.DefaultReproduction,
