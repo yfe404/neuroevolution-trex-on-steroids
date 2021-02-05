@@ -42,11 +42,11 @@ p8890 = Lock() # 8767
 p8891 = Lock() # 8768
 p8892 = Lock() # 8769
 #
-p8893 = Lock() # 8770
-p8894 = Lock() # 8771
-p8895 = Lock() # 8772
-p8896 = Lock() # 8773
-p8897 = Lock() # 8774
+#p8893 = Lock() # 8770
+#p8894 = Lock() # 8771
+#p8895 = Lock() # 8772
+#p8896 = Lock() # 8773
+#p8897 = Lock() # 8774
 
 def get_port():
     if p8888.acquire(block=False):
@@ -64,20 +64,20 @@ def get_port():
     if p8892.acquire(block=False):
         return 4
 
-    if p8893.acquire(block=False):
-        return 5
+#    if p8893.acquire(block=False):
+#        return 5
 
-    if p8894.acquire(block=False):
-        return 6
+#    if p8894.acquire(block=False):
+#        return 6
 
-    if p8895.acquire(block=False):
-        return 7
+#    if p8895.acquire(block=False):
+#        return 7
 
-    if p8896.acquire(block=False):
-        return 8
+#    if p8896.acquire(block=False):
+#        return 8
 
-    if p8897.acquire(block=False):
-        return 9
+#    if p8897.acquire(block=False):
+#        return 9
 
 
 def eval_genome(genome, config):
@@ -90,8 +90,15 @@ def eval_genome(genome, config):
     env = Environment("127.0.0.1", 8765+_id, debug=False)
     time.sleep(2)
 
-    subprocess.Popen(["qutebrowser", "--target", "window", f"http://localhost:{8888+_id}"])
+    this_env = os.environ.copy()
+#    this_env["DISPLAY"] = ":1"
+    subprocess.Popen(["qutebrowser", "--target", "window", f"http://localhost:{8888+_id}"], env=this_env)
 
+
+#    subprocess.Popen(["firefox", "-new-window", f"http://localhost:{8888+_id}"], env=this_env)
+#    subprocess.Popen(["opera", f"http://localhost:{8888+_id}"], env=this_env)
+
+    
     preprocessor = SimplePreprocessor()
 
     time.sleep(10)
@@ -115,24 +122,30 @@ def eval_genome(genome, config):
     return fitness
     
 def eval_genomes(genomes, config):
+    
+#    subprocess.Popen(["Xvfb", ":1",  "-screen", "1", " 1920x1080x24"])
     pool = multiprocessing.Pool(processes=10)
     eval_genome_fixed_conf=partial(eval_genome, config=config)
     fitnesses = pool.map(eval_genome_fixed_conf, genomes)
     for genome, fitness in zip([g[1] for g in genomes], fitnesses):
         genome.fitness = fitness
 
+    #subprocess.Popen(["sh", "killer.sh"])
+
     subprocess.Popen(["pkill", "qutebrowser"])
+#    subprocess.Popen(["killall", "Xvfb"])
+
     p8888.release()
     p8889.release()
     p8890.release()
     p8891.release()
     p8892.release()
 
-    p8893.release()
-    p8894.release()
-    p8895.release()
-    p8896.release()
-    p8897.release()
+#    p8893.release()
+#    p8894.release()
+#    p8895.release()
+#   p8896.release()
+#   p8897.release()
 
     
 def run(config_file):
@@ -169,7 +182,7 @@ def run(config_file):
     #visualize.plot_species(stats, view=True)
 
     #p = neat.Checkpointer.restore_checkpoint('neat-checkpoint-4')
-    p.run(eval_genomes, 10)
+    p.run(eval_genomes, 5)
 
 
 if __name__ == '__main__':
