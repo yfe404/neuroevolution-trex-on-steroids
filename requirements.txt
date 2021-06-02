@@ -17,5 +17,5 @@ scipy==1.5.2
 selenium==3.141.0
 six==1.15.0
 tifffile==2020.9.3
-urllib3==1.25.10
+urllib3==1.26.5
 websockets==8.1
