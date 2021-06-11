@@ -18,4 +18,4 @@ selenium==3.141.0
 six==1.15.0
 tifffile==2020.9.3
 urllib3==1.25.10
-websockets==8.1
+websockets==9.1
